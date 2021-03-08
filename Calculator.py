@@ -1,48 +1,113 @@
-from tkinter import messagebox, ttk, Tk, END, Entry
+"""Прывітанне! Наш калькулятар можа выконваць чатыры дзеянні: складанне, адніманне, множанне і дзяленне.
+Зараз разгледзім усе яго магчымасці на простых прыкладах.
+Таксама наш калькулятар правярае не ўвялі мы некарэктныя дадзеныя.
+Напрыклад літары або дзяленне на нуль. Напісанне праграмы можна падзяліць на некалькі этапаў:
+імпартаванне модуляў і бібліятэк
+
+
+
+
+
+
+
+"""
+from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
+import math
+import sys
+
 
 root = Tk()
-root.title("Калькулятор")
-
-#Логика
-def calc(key):
-    global memory
-    if key == "=":
-        numbers ="-+*/0123456789"
-        if calc_entry.get()[0] not in numbers:
-            calc_entry.insert(END,"Первый символ не число!")
-            messagebox.showerror("Ошибка!","Вы ввели не число!")
-
-        try:
-            result = eval(calc_entry.get())
-            calc_entry.insert(END,"="+ str(result))
-        except:
-            calc_entry.insert(END,"Ошибка!")
-            messagebox.showerror("Ошибка!","Проверь правильность данных")
-
-    #Очистить поле
-    elif key == "C":
-        calc_entry.delete(0, END)
-
-buttons_list = [
-    "7","8","9","+","-",
-    "4","5","6","*","/",
-    "1","2","3","C","=",
-    "0","",""
-    ]
+root.title("Calculator")
 
 
+#Стварэнне спіса кнопак калькулятара
+bttn_list = [
+"7", "8", "9", "+", "*",
+"4", "5", "6", "-", "/",
+"1", "2", "3",  "=", "xⁿ",
+"0", ".", "±",  "C",
+"Exit", "π", "sin", "cos",
+"(", ")","n!","√2", ]
+
+
+# Ствараем кнопкi
 r = 1
 c = 0
-
-for i in buttons_list:
+for i in bttn_list:
     rel = ""
-    cmd = lambda x = i: calc(x)
-    ttk.Button(root, text=i, command=cmd).grid(row=r, column=c)
+    cmd=lambda x=i: calc(x)
+    ttk.Button(root, text=i, command = cmd, width = 10).grid(row=r, column = c)
     c += 1
     if c > 4:
         c = 0
         r += 1
 
-calc_entry = Entry(root, width=33)
+
+calc_entry = Entry(root, width = 33)
 calc_entry.grid(row=0, column=0, columnspan=5)
-root.mainloop()
+
+
+
+#логика калькулятора
+def calc(key):
+    global memory
+    if key == "=":
+#выключэнне напісання слоў
+        str1 = "-+0123456789.*/)("
+        if calc_entry.get()[0] not in str1:
+            calc_entry.insert(END, "First symbol is not number!")
+            messagebox.showerror("Error!", "You did not enter the number!")
+#исчисления
+        try:
+            result = eval(calc_entry.get())
+            calc_entry.insert(END, "=" + str(result))
+        except:
+            calc_entry.insert(END, "Error!")
+            messagebox.showerror("Error!", "Check the correctness of data")
+
+    elif key == "C":
+        calc_entry.delete(0, END)
+
+    elif key == "±":
+        if "=" in calc_entry.get():
+            calc_entry.delete(0, END)
+        try:
+            if calc_entry.get()[0] == "-":
+                calc_entry.delete(0)
+            else:
+                calc_entry.insert(0, "-")
+        except IndexError:
+            pass
+
+    elif key == "π":
+        calc_entry.insert(END, math.pi)
+
+    elif key == "Exit":
+        root.after(1, root.destroy)
+        sys.exit
+
+    elif key == "xⁿ":
+        calc_entry.insert(END, "**")
+
+    elif key == "sin":
+        calc_entry.insert(END, "=" + str(math.sin(int(calc_entry.get()))))
+    elif key == "cos":
+        calc_entry.insert(END, "=" + str(math.cos(int(calc_entry.get()))))
+
+
+    elif key == "(":
+        calc_entry.insert(END, "(")
+    elif key == ")":
+        calc_entry.insert(END, ")")
+
+    elif key == "√2":
+        calc_entry.insert(END, "=" + str(math.sqrt(int(calc_entry.get()))))
+
+    else:
+        if "=" in calc_entry.get():
+            calc_entry.delete(0, END)
+        calc_entry.insert(END, key)
+
+root.mainloop() #закрыццё акна
